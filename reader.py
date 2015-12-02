@@ -66,28 +66,24 @@ drop_non_intersecting('correlations_unique')
 #         print csv_file, multiplier, column
 
 
-# for csv_file in all_csvs_in_directory('valid_data'):
-#     df = pd.read_csv('{}/{}'.format('valid_data', csv_file), header=0)
-#     df = df.set_index(df['AAAIndicator Name'])
-#     for column in df.ix[:,6:len(df.ix[1,]) -1]:  # for every year except the last one
-#         current_internet_value = df.ix[df['Indicator Code'] == 'IT.NET.USER.P2', column]  # take the current years internet value
-#         next_internet_value = df.ix[df['Indicator Code'] == 'IT.NET.USER.P2', str(int(column)+1)]  # take the next years value of internet
-#         try:
-#             multiplier = ((next_internet_value - current_internet_value)/current_internet_value).values[0]
-#         except IndexError as e:
-#             print e, csv_file, column
-#         i = 0
-#         for value, next_value in  zip(df[column], df[str(int(column)+1)]):  # look at one factor for this and next year
-#             high = value + (value * multiplier)
-#             low = value - (value * multiplier)
-#             if low <= next_value <= high:
-#                 pass
-#             else:
-#                 #print 'For {} to {} internet changed by {}, c{}, n{}'.format(column, int(column)+1,multiplier,value,next_value)
-#                 df = df[df[column] != value]
-#                 #print "DROPPED"
-#             i+=1
-#     df.to_csv(csv_file)
+for csv_file in all_csvs_in_directory('valid_data'):
+    df = pd.read_csv('{}/{}'.format('valid_data', csv_file), header=0)
+    df = df.set_index(df['AAAIndicator Name'])
+    for column in df.ix[:,6:len(df.ix[1,]) -1]:
+        current_internet_value = df.ix[df['Indicator Code'] == 'IT.NET.USER.P2', column]
+        next_internet_value = df.ix[df['Indicator Code'] == 'IT.NET.USER.P2', str(int(column)+1)]
+        try:
+            multiplier = ((next_internet_value - current_internet_value)/current_internet_value).values[0]
+        except IndexError as e:
+            print e, csv_file, column
+        for value, next_value in  zip(df[column], df[str(int(column)+1)]):
+            high = value + (value * multiplier)
+            low = value - (value * multiplier)
+            if low <= next_value <= high:
+                pass
+            else:
+                df = df[df[column] != value]
+    df.to_csv(csv_file)
 
 
 
